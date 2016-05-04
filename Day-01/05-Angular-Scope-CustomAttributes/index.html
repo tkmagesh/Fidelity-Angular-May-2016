@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Salary Calculator</title>
+	<style>
+	.field{
+		margin-bottom: 10px
+	}
+	#divResult{
+		color : red;
+		font-size: 20pt;
+	}
+	label{
+		display: block;
+	}
+	body{
+		margin-left: 40px;
+	}
+	</style>
+	<script src="jquery-1.12.3.js"></script>
+	<script src="angular.min.js"></script>
+	<script>
+		Object.prototype.toFloat = function(){
+			return parseFloat(this,10);
+		};
+		//Model
+		function SalaryCalculator(){
+			this.basic = 0;
+			this.hra = 0;
+			this.da = 0;
+			this.tax = 0;
+			this.salary = 0;
+		}
+		SalaryCalculator.prototype.calculate = function(){
+			var gross = this.basic + this.hra + this.da;
+			this.salary = gross * ((100-this.tax)/100);
+		};
+		SalaryCalculator.prototype.reset = function(){
+			this.basic = this.hra = this.da = this.tax = this.salary = 0;
+		}
+
+		//Scope
+		angular.injector(["ng"]).invoke(function($rootScope){
+			window.scope = $rootScope;
+			scope.calculator = window.calculator = new SalaryCalculator();
+		});
+
+		//View
+		function compile(root){
+			function bindTwoWay(control, model, scope){
+				var $control = $(control)
+				$control.change(function(){
+					scope.$apply(function(){
+						var expr = model + ' = ' + $control.val().toFloat();
+						scope.$eval(expr);
+					});
+				});
+				scope.$watch(model, function(newValue){
+					$control.val(newValue);
+				});
+			}
+
+			function bindOneWay(control, model, scope){
+				var $control = $(control)
+				scope.$watch(model, function(newValue){
+					$control.html(newValue);
+				});
+			}
+
+			function bindClick(control, expr, scope){
+				var $control = $(control);
+				$control.click(function(){
+					scope.$apply(function(){
+						scope.$eval(expr);	
+					});
+				});
+			}
+			var _root = root;
+			return function(scope){
+
+				$("*[app-model]").each(function(index, control){
+					var model = $(control).attr("app-model");
+					bindTwoWay(control, model, scope);
+				});
+
+				$("*[app-bind]").each(function(index, control){
+					var model = $(control).attr("app-bind");
+					bindOneWay(control, model, scope);
+				});
+
+				$("*[app-click]").each(function(index, control){
+					var expr = $(control).attr("app-click");
+					bindClick(control, expr, scope);
+				});
+			};
+
+		}
+		
+		$(document).ready(function(){
+			compile(document.body)(window.scope);
+		});
+	</script>
+</head>
+<body>
+	<h1>Salary Calculator</h1>
+	<div class="content">
+		<div class="field">
+			<label for="">Basic :</label>
+			<input type="text" name="" id="txtBasic" app-model="calculator.basic">
+		</div>
+		<div class="field">
+			<label for="">HRA :</label>
+			<input type="text" name="" id="txtHra" app-model="calculator.hra">
+		</div>
+		<div class="field">
+			<label for="">DA :</label>
+			<input type="text" name="" id="txtDa" app-model="calculator.da">
+		</div>
+		<div class="field">
+			<label for="">Tax :</label>
+			<input type="range" name="" id="rangeTax" min="0" max="30" app-model="calculator.tax">
+			<span id="spanTax" app-bind="calculator.tax">[Tax]</span>
+		</div>
+		<div class="field">
+			<input type="button" value="Calculate" id="btnCalculate" app-click="calculator.calculate()"></input>
+			<input type="button" value="Reset" app-click="calculator.reset()">
+		</div>
+		<div class="field">
+			<span id="divResult" app-bind="calculator.salary">[Salary]</span>
+		</div>
+	</div>
+</body>
+</html>
