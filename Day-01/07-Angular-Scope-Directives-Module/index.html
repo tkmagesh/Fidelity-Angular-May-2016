@@ -40,27 +40,13 @@
 			this.basic = this.hra = this.da = this.tax = this.salary = 0;
 		}
 		
-		/*$(document).ready(function(){
-			angular.injector(["ng"]).invoke(function($rootScope, $compile){
-				$rootScope.calculator = new SalaryCalculator();
-				$compile(document.body)($rootScope);
-			});
-		});*/
-
-		/*angular.element(document).ready(function(){
-			angular.injector(["ng"]).invoke(function($rootScope, $compile){
-				//console.log(arguments);
-				$rootScope.calculator = new SalaryCalculator();
-				$compile(document.body)($rootScope);
-			});
-		});*/
-
-		angular.module("ng").run(function($rootScope){
+		var myApp = angular.module("myApp", [])
+		myApp.run(function($rootScope){
 			$rootScope.calculator = new SalaryCalculator();
 		});
 	</script>
 </head>
-<body ng-app>
+<body ng-app="myApp">
 	<h1>Salary Calculator</h1>
 	<div class="content">
 		<div class="field">
@@ -85,7 +71,7 @@
 			<input type="button" value="Reset" ng-click="calculator.reset()">
 		</div>
 		<div class="field">
-			<span id="divResult" ng-bind="calculator.salary">[Salary]</span>
+			<span id="divResult" ng-bind="calculator.salary | currency:'Rs'">[Salary]</span>
 		</div>
 	</div>
 </body>
