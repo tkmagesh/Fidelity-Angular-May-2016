@@ -63,25 +63,46 @@
 	<script src="angular.min.js"></script>
 	<script>
 		var bugTrackerApp = angular.module("bugTrackerApp", []);
-		bugTrackerApp.controller("bugsController", function($scope){
+
+		bugTrackerApp.value("appDefaults", {
+			bugName : '[Default Bug Name]',
+			trimLength : 30
+		});
+		
+		bugTrackerApp.factory("bugOperations", function (appDefaults){
+			var currentBugId = 0;
+			return {
+				toggle : function(bug){
+					bug.isClosed = !bug.isClosed;
+				},
+				create : function(bugName){
+					bugName = bugName || appDefaults.bugName;
+					return {
+						id : ++currentBugId,
+						name : bugName,
+						isClosed : false
+					};
+				}
+			};
+		});
+
+		bugTrackerApp.controller("bugsController", function($scope, bugOperations){
+
 			$scope.bugs = [
-				{ name : "Object reference not set to an instance of an object", isClosed : false},
-				{ name : "Stack overflow error", isClosed : true},
-				{ name : "Null pointer exception", isClosed : false},
-				{ name : "User authentication wrong", isClosed : false},
+				bugOperations.create("Object reference not set to an instance of an object"),
+				bugOperations.create("Stack overflow error"),
+				bugOperations.create("Null pointer exception"),
+				bugOperations.create("User authentication wrong"),
 			];
 
 			
 			$scope.addNew = function(bugName){
-				var newBug = {
-					name : bugName,
-					isClosed : false
-				};
+				var newBug = bugOperations.create(bugName);
 				$scope.bugs.push(newBug);
 			};
 
 			$scope.toggle = function(bug){
-				bug.isClosed = !bug.isClosed;
+				bugOperations.toggle(bug);
 			};
 
 			$scope.removeClosed = function(){
@@ -96,6 +117,14 @@
 					if ($scope.bugs[i].isClosed)
 						++result;
 				return result;
+			};
+		
+		});
+
+		bugTrackerApp.filter('trimText', function(appDefaults){
+			return function(data, trimLength){
+				trimLength = trimLength || appDefaults.trimLength;
+				return data.length < trimLength ? data : data.substr(0,trimLength) + '...';
 			}
 		});
 	</script>
@@ -133,7 +162,7 @@
 			<ol>
 				<li ng-repeat="bug in (bugs | filter:searchBug | orderBy:sortBugBy:sortByDescending)">
 					<span class="bugName" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">
-						{{bug.name}}
+						{{bug.name | trimText}}
 					</span>
 					<div class="datetime">[Created At]</div>
 				</li>
