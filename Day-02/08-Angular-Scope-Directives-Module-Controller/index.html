@@ -53,7 +53,7 @@
 </head>
 <body ng-app="myApp">
 	<h1>Salary Calculator</h1>
-
+	<i>changed at <span ng-bind="changedAt"></span></i>
 	<div class="content" ng-controller="calculatorController">
 		<div class="field">
 			<label for="">Basic :</label>
@@ -79,7 +79,7 @@
 		<div class="field">
 			<span id="divResult" ng-bind="calculator.salary | currency:'Rs'">[Salary]</span>
 		</div>
-		
+
 	</div>
 </body>
 </html>
