@@ -74,6 +74,7 @@
 		14. Authentication & Authorization
 		*/
 	</script>
+	<script src="jquery-1.12.3.js"></script>
 	<script src="angular.min.js"></script>
 	<script src="moment.js"></script>
 	<script src="utils.js"></script>
@@ -103,6 +104,34 @@
 		bugTrackerApp.value("appDefaults", {
 			bugName : '[Default Bug Name]',
 			trimLength : 30
+		});
+
+		bugTrackerApp.directive("bugItem", function($compile){
+			var t1 = '<span  class="bugd"><span>{{bugData.name | trimText}}</span><a class="more" href="#">More</a></span>';
+			var t2 = '<span>{{bugData.name}}</span>';
+			return {
+				templateUrl : 'templates/bug-item-template.html',
+				scope : {
+					bugData : '='
+				},
+				link : function($scope, $element, $attr){
+					var scope = $scope;
+					$element.on('click','.more',function(){
+						$(this).parent().html(scope.bugData.name);
+						return false;
+
+					});
+					var bugName = $scope.bugData.name;
+					if (bugName.length > 30){
+						var elem = $compile(t1)($scope);
+						$element.find('.bugName').append(elem);
+					} else {
+						var elem = $compile(t2)($scope);
+						$element.find('.bugName').append(elem);
+					}
+					//$element.find('.bugName').html(bugName);
+				}
+			};
 		});
 		
 		bugTrackerApp.factory("bugOperations", function (appDefaults){
@@ -214,7 +243,7 @@
 				get : getById
 			}
 		});
-		
+
 		bugTrackerApp.controller("bugDetailsController", function($scope, bugService, $routeParams){
 			var bugId = parseInt($routeParams.id);
 			bugService

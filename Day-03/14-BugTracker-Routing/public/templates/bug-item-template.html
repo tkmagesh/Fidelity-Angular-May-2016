@@ -1,0 +1,5 @@
+<span class="bugName" ng-click="toggle(bugData)" ng-class="{closed : bugData.isClosed}">
+	
+</span>
+<div class="datetime">{{bugData.createdAt | elapsed}}</div>
+<a href="#/details/{{bugData.id}}">Details</a>

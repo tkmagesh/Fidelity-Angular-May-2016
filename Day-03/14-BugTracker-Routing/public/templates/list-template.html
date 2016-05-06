@@ -26,11 +26,7 @@
 		<a href="#/new">Create New</a>
 		<ol>
 			<li ng-repeat="bug in (bugs | filter:searchBug | orderBy:sortBugBy:sortByDescending)">
-				<span class="bugName" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">
-					{{bug.name | trimText}}
-				</span>
-				<div class="datetime">{{bug.createdAt | elapsed}}</div>
-				<a href="#/details/{{bug.id}}">Details</a>
+				<bug-item bug-data="bug"></bug-item>
 			</li>
 		</ol>
 		<input type="button" value="Remove Completed" ng-click="removeClosed()">

@@ -1,0 +1,8 @@
+<h2>{{bug.name}}</h2>
+<h3>
+	<span>Status :</span>
+	<span style="color:red">{{bug.isClosed ? "Closed" : "Open"}}</span>
+</h3>
+<p>{{bug.desc}}</p>
+<div>Created : {{bug.createdAt | elapsed}}</div>
+<a href="/#/list">Go To List</a>

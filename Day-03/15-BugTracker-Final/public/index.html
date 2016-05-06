@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<link rel="stylesheet" href="styles/style.css">
+</head>
+<body ng-app="bugTrackerApp">
+	<h1>Bug Tracker - Server</h1>
+	<hr>
+	<ng-view></ng-view>
+
+
+	<script src="/vendor/angular.min.js"></script>
+	<script src="/vendor/moment.js"></script>
+	<script src="/vendor/angular-route.js"></script>
+	
+	<script src="/utils/utils.js"></script>
+
+	<script src="/bugs/common/common.js"></script>
+	<script src="/bugs/common/bugOperations.js"></script>
+	<script src="/bugs/common/bugService.js"></script>
+	<script src="/bugs/common/appDefaults.js"></script>
+
+	<script src="/bugs/details/details.js"></script>
+	<script src="/bugs/details/bugDetailsController.js"></script>
+
+	<script src="/bugs/list/list.js"></script>
+	<script src="/bugs/list/bugsController.js"></script>
+	<script src="/bugs/list/toClosedCount.js"></script>
+
+	<script src="/bugs/new/new.js"></script>
+	<script src="/bugs/new/newBugController.js"></script>
+
+	<script src="/bugs/app.js"></script>
+</body>
+</html> 
