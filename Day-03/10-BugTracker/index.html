@@ -66,7 +66,7 @@
 					* clear()
 					* length
 				- Use angular.toJson() and angular.fromJson() for serialization and deserialization
-				
+
 		10. Display 'createdAt' - done
 		11. Persist the bugs in the server
 		12. Add 'description' to the bugs
@@ -103,29 +103,61 @@
 			};
 		});
 
-		bugTrackerApp.controller("bugsController", function($scope, bugOperations){
+		bugTrackerApp.factory("bugStorage", function(bugOperations, $window){
+			var storage = $window.localStorage;
 
-			$scope.bugs = [
-				bugOperations.create("Object reference not set to an instance of an object"),
-				bugOperations.create("Stack overflow error"),
-				bugOperations.create("Null pointer exception"),
-				bugOperations.create("User authentication wrong"),
-			];
+			function getAllBugs(){
+				var result = [];
+				for(var i=0; i<storage.length; i++){
+					var key = storage.key(i);
+					var jsonString = storage.getItem(key);
+					result.push(angular.fromJson(jsonString));
+				}
+				return result;
+			}
+			function addBug(bugName){
+				var newBug = bugOperations.create(bugName);
+				saveBug(newBug);
+				return newBug;
+			}
+			function toggleBug(bug){
+				bugOperations.toggle(bug);
+				saveBug(bug);
+			}
+			function saveBug(bug){
+				storage.setItem(bug.id, angular.toJson(bug));
+			}
+			function removeBug(bug){
+				storage.removeItem(bug.id);
+			}
+			return {
+				getAll : getAllBugs,
+				add : addBug,
+				toggle : toggleBug,
+				remove : removeBug
+			};
+		})
+
+		bugTrackerApp.controller("bugsController", function($scope, bugStorage){
+
+			$scope.bugs = bugStorage.getAll();
 
 			
 			$scope.addNew = function(bugName){
-				var newBug = bugOperations.create(bugName);
+				var newBug = bugStorage.add(bugName);
 				$scope.bugs.push(newBug);
 			};
 
 			$scope.toggle = function(bug){
-				bugOperations.toggle(bug);
+				bugStorage.toggle(bug);
 			};
 
 			$scope.removeClosed = function(){
 				for(var i=$scope.bugs.length-1; i>=0 ; i--)
-					if ($scope.bugs[i].isClosed)
+					if ($scope.bugs[i].isClosed){
+						bugStorage.remove($scope.bugs[i]);
 						$scope.bugs.splice(i,1);
+					}
 			};
 
 		});
