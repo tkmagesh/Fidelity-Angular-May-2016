@@ -94,7 +94,7 @@
 				create : function(bugName){
 					bugName = bugName || appDefaults.bugName;
 					return {
-						id : ++currentBugId,
+						id : 0,
 						name : bugName,
 						isClosed : false,
 						createdAt : new Date()
@@ -138,24 +138,31 @@
 			};
 		})
 
-		bugTrackerApp.controller("bugsController", function($scope, bugStorage){
+		bugTrackerApp.controller("bugsController", function($scope, bugStorage, $http, bugOperations){
 
-			$scope.bugs = bugStorage.getAll();
-
+			$scope.bugs = [];
+			var p1 = $http.get('http://localhost:3000/bugs');
+			p1.then(function(response){
+				$scope.bugs = response.data;
+			});
 			
 			$scope.addNew = function(bugName){
-				var newBug = bugStorage.add(bugName);
-				$scope.bugs.push(newBug);
+				var bugData = bugOperations.create(bugName);
+				var p2 = $http.post('http://localhost:3000/bugs', bugData);
+				p2.then(function(response){
+					$scope.bugs.push(response.data);
+				});
 			};
 
 			$scope.toggle = function(bug){
-				bugStorage.toggle(bug);
+				bugOperations.toggle(bug);
+				$http.put('http://localhost:3000/bugs/' + bug.id, bug);
 			};
 
 			$scope.removeClosed = function(){
 				for(var i=$scope.bugs.length-1; i>=0 ; i--)
 					if ($scope.bugs[i].isClosed){
-						bugStorage.remove($scope.bugs[i]);
+						$http.delete('http://localhost:3000/bugs/' + $scope.bugs[i].id);
 						$scope.bugs.splice(i,1);
 					}
 			};
