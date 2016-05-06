@@ -1,0 +1,18 @@
+<style>
+	.notopen{
+		color : red;
+	}
+	.open{
+		color : green;
+	}
+</style>
+<h3>{{bug.name}}</h3>
+<div>
+	<i>Created <span style="font-weight:bold">{{bug.createdAt | elapsed}}</span></i>	
+</div>
+<div>
+	<i>Status <span style="font-weight:bold" ng-class="{notopen : bug.isClosed, open : !bug.isClosed}">
+		{{bug.isClosed ? 'Closed' : 'Open'}}</span></i>
+</div>
+
+<p>{{bug.desc}}</p>
