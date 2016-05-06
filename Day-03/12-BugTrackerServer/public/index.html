@@ -136,33 +136,84 @@
 				toggle : toggleBug,
 				remove : removeBug
 			};
-		})
+		});
 
-		bugTrackerApp.controller("bugsController", function($scope, bugStorage, $http, bugOperations){
+		bugTrackerApp.factory("bugService", function($http, bugOperations, $q){
+			/*function getAllBugs(){
+				var deferred = $q.defer();
 
-			$scope.bugs = [];
-			var p1 = $http.get('http://localhost:3000/bugs');
-			p1.then(function(response){
-				$scope.bugs = response.data;
+				var p1 = $http.get('http://localhost:3000/bugs');
+				p1.then(function(response){
+					var result = response.data;
+					deferred.resolve(result);
+				});
+
+				return deferred.promise;
+			}*/
+
+			/*function getAllBugs(){
+				var httpPromise = $http.get('http://localhost:3000/bugs');
+				var myPromise = httpPromise.then(function(response){
+					var result = response.data;
+					return result;
+				});
+				return myPromise;
+			}*/
+
+			function getAllBugs(){
+				return $http
+					.get('http://localhost:3000/bugs')
+					.then(function(response){
+						return response.data;
+					});
+			}
+			function addNew(bugName){
+				var bugData = bugOperations.create(bugName);
+				return $http
+					.post('http://localhost:3000/bugs', bugData)
+					.then(function(response){
+						return response.data;
+					});
+			}
+
+			function toggleBug(bug){
+				bugOperations.toggle(bug);
+				$http.put('http://localhost:3000/bugs/' + bug.id, bug);
+			}
+
+			function removeBug(bug){
+				$http.delete('http://localhost:3000/bugs/' + bug.id);
+			}
+			return {
+				getAll : getAllBugs,
+				add : addNew,
+				toggle : toggleBug,
+				remove : removeBug
+			}
+		});
+
+		bugTrackerApp.controller("bugsController", function($scope, bugService){
+
+			//$scope.bugs = [];
+			
+			bugService.getAll().then(function(bugs){
+				$scope.bugs = bugs;
 			});
 			
 			$scope.addNew = function(bugName){
-				var bugData = bugOperations.create(bugName);
-				var p2 = $http.post('http://localhost:3000/bugs', bugData);
-				p2.then(function(response){
-					$scope.bugs.push(response.data);
+				bugService.add(bugName).then(function(newBug){
+					$scope.bugs.push(newBug);
 				});
 			};
 
 			$scope.toggle = function(bug){
-				bugOperations.toggle(bug);
-				$http.put('http://localhost:3000/bugs/' + bug.id, bug);
+				bugService.toggle(bug);
 			};
 
 			$scope.removeClosed = function(){
 				for(var i=$scope.bugs.length-1; i>=0 ; i--)
 					if ($scope.bugs[i].isClosed){
-						$http.delete('http://localhost:3000/bugs/' + $scope.bugs[i].id);
+						bugService.remove($scope.bugs[i]);
 						$scope.bugs.splice(i,1);
 					}
 			};
