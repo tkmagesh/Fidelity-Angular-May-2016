@@ -103,10 +103,10 @@
 			};
 		});
 
-		bugTrackerApp.factory("bugStorage", function(bugOperations, $window){
+		bugTrackerApp.service("bugStorage", function(bugOperations, $window){
 			var storage = $window.localStorage;
 
-			function getAllBugs(){
+			this.getAll = function(){
 				var result = [];
 				for(var i=0; i<storage.length; i++){
 					var key = storage.key(i);
@@ -115,27 +115,22 @@
 				}
 				return result;
 			}
-			function addBug(bugName){
+			this.add = function(bugName){
 				var newBug = bugOperations.create(bugName);
 				saveBug(newBug);
 				return newBug;
 			}
-			function toggleBug(bug){
+			this.toggle = function(bug){
 				bugOperations.toggle(bug);
 				saveBug(bug);
 			}
 			function saveBug(bug){
 				storage.setItem(bug.id, angular.toJson(bug));
 			}
-			function removeBug(bug){
+			this.remove = function(bug){
 				storage.removeItem(bug.id);
 			}
-			return {
-				getAll : getAllBugs,
-				add : addBug,
-				toggle : toggleBug,
-				remove : removeBug
-			};
+			
 		});
 
 		bugTrackerApp.factory("bugService", function($http, bugOperations, $q){
